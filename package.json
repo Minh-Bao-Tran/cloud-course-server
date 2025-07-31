@@ -1,0 +1,25 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Minh-Bao-Tran/cloud-course-server.git"
+  },
+  "keywords": [
+    "cloud"
+  ],
+  "author": "Minh Tran",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Minh-Bao-Tran/cloud-course-server/issues"
+  },
+  "homepage": "https://github.com/Minh-Bao-Tran/cloud-course-server#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
