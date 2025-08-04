@@ -1,0 +1,6 @@
+POST http://localhost:3000/auth/login
+
+###
+
+GET http://localhost:3000/test
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc0F1dGgiOnRydWUsInVzZXIiOiJNYXR0IiwiaWF0IjoxNzU0Mjk1NTYzfQ.sywiNjMQT3Teg11lb4f0svtQuPl71qgBQxQ6ZPCmgK8\
