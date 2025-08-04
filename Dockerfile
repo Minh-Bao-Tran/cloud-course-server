@@ -1,5 +1,5 @@
-# Use the official Node.js alpine lightweight image as the base image
-FROM node:22-alpine
+# Use the official Node.js slim lightweight image as the base image
+FROM node:22-slim
 
 # Set the working directory inside the container
 WORKDIR /app
