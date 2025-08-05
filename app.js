@@ -23,7 +23,7 @@ app.use("/auth", authRoutes);
 app.use(authenticateMiddleware); // Any routes that requires authentication is behind this line
 
 app.get("/test", function (req, res) {
-  console.log();
+  console.log(req.userData);
   return res.send("success");
 });
 
@@ -33,5 +33,5 @@ db.connectToDatabase().then(function () {
   app.listen(3000, () => {
     console.log("listening on port 3000");
   });
-  db.getDb().collection("user").insertOne({ content: "test" });
+  // db.getDb().collection("user").insertOne({ content: "test" });
 });

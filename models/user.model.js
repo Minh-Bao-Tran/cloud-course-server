@@ -27,8 +27,21 @@ class User {
   }
   async editUser() {}
 
-  async fetchUserByID(_id) {}
-  async fetchUserByUserName(userName) {}
+  static async fetchUserByID(_id) {
+    //ID must already be in Object ID form
+    const result = await db.getDb().collection("users").findOne({ _id: _id });
+    return result;
+  }
+
+  static async fetchUserByUserName(userName) {
+    const result = await db.getDb().collection("users").findOne({ userName: userName });
+    return result;
+  }
+
+  static async fetchUserByEmail(email) {
+    const result = await db.getDb().collection("users").findOne({ email: email });
+    return result;
+  }
 
   async fetchPilotDetails() {}
 }

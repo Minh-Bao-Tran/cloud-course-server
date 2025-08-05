@@ -5,11 +5,17 @@ function validateUserData(userData) {
       userData.password &&
       userData.confirmedPassword &&
       userData.email &&
-      userData.mobile
+      userData.mobile &&
+      userData.agreedToTermAndCondition
     )
   ) {
     // One of the mandatory fields is missing
     return { valid: false, message: "Data is not valid" };
+  }
+
+  if (!userData.agreedToTermAndCondition) {
+    // term and condition is not agreed to
+    return { valid: false, message: "Please agree to term and condition" };
   }
 
   if (userData.password != userData.confirmedPassword) {
@@ -23,12 +29,14 @@ function validateUserData(userData) {
     alse;
   }
 
+  const mobile = Number(userData.mobile);
   if (
-    !Number.isInteger(userData.mobile) ||
+    !Number.isInteger(mobile) ||
     userData.mobile.length > 11 ||
     userData.mobile.length < 8
   ) {
     //Mobile Number is not valid
+    console.log();
     return { valid: false, message: "Mobile number is not valid" };
   }
 
