@@ -2,14 +2,15 @@ require("dotenv").config();
 
 const express = require("express");
 
+const moduleAlias = require("module-alias/register");
 const cookieParser = require("cookie-parser");
 
-const db = require("./data/database.js");
+const db = require("@data/database.js");
 
-const authenticateMiddleware = require("./middleware/authenticate.middleware.js");
-const errorHandlingMiddleware = require("./middleware/error.middleware.js");
+const authenticateMiddleware = require("@middleware/authenticate.middleware.js");
+const errorHandlingMiddleware = require("@middleware/error.middleware.js");
 
-const authRoutes = require("./routes/auth.route.js");
+const authRoutes = require("@route/auth.route.js");
 
 const app = express();
 
@@ -32,5 +33,5 @@ db.connectToDatabase().then(function () {
   app.listen(3000, () => {
     console.log("listening on port 3000");
   });
-  // db.getDb().collection("test").insertOne({ content: "test" });
+  db.getDb().collection("user").insertOne({ content: "test" });
 });

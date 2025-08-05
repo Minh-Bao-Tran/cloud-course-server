@@ -2,11 +2,11 @@ const express = require("express");
 
 const jwt = require("jsonwebtoken");
 
+const userController = require("@controller/auth.controller.js");
+
 const router = express.Router();
 
-router.post("/signup", function (req, res) {
-  //   res.send(req.cookies.token);
-});
+router.post("/signup", userController.signUp);
 
 router.post("/login", function (req, res) {
   const token = jwt.sign(
