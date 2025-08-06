@@ -9,11 +9,20 @@
 ## Setup the docker
 
 ```bash
-    docker build -t cloud-course-server .
+    # docker build -t cloud-course-server .
+    docker-compose up --build
 ```
 
-## Build the container
+## Run the container
 
 ```bash
-    docker run -d -p 3000:3000 --name cloud-course-server -v $(pwd):/app cloud-course-server
+    docker-compose up
+    # docker run -d -p 3000:3000 --name cloud-course-server -v $(pwd):/app cloud-course-server
+```
+
+## Stop the container
+
+```bash
+    docker-compose down
+    # docker run -d -p 3000:3000 --name cloud-course-server -v $(pwd):/app cloud-course-server
 ```

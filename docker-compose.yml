@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  app:
+  cloud-course-api:
       build:
         context: .
         dockerfile: Dockerfile
@@ -9,6 +9,8 @@ services:
         - "3000:3000" # Map port 3000 on the host to port 3000 in the container
       environment:
         - MONGO_URI=mongodb://CloudCourse:12345678@mongo:27017
+        - MONGODB_DATABASE_NAME=cloud-course
+        - SECRET_KEY=secret
       depends_on:
         - mongo # Ensure MongoDB starts before the app
       networks:
