@@ -6,7 +6,7 @@ function authenticate(req, res, next) {
   const authToken = bearerToken && bearerToken.replace("Bearer ", ""); //Check if the token exist. if yes, cut the Bearer part from the Bearer format and pass it on
 
   if (!authToken) {
-    return next(createError(401, "User is not authenticated"));
+    return next(createError(403, "User is not authenticated"));
   }
 
   let result;
@@ -15,10 +15,10 @@ function authenticate(req, res, next) {
       algorithms: "HS256",
     });
   } catch (error) {
-    next(createError(401, "User is not authenticated"));
+    next(createError(403, "User is not authenticated"));
   }
 
-  req.userData = result; //Add userData to request so it is easily accessed by other middleware/routes
+  req.auth = result; //Add userData to request so it is easily accessed by other middleware/routes
 
   next();
 }

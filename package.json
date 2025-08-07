@@ -36,9 +36,9 @@
   },
   "_moduleAliases": {
     "@util": "util",
-    "@model": "models",
-    "@controller": "controllers",
-    "@route": "routes",
+    "@model": "model",
+    "@controller": "controller",
+    "@route": "route",
     "@data": "data",
     "@middleware": "middleware"
   }

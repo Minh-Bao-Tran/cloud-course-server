@@ -3,20 +3,13 @@ const createError = require("http-errors");
 const mongodb = require("mongodb");
 const bcrypt = require("bcryptjs");
 
-const validateJs = require("@util/validateUserData.js");
+const validateUtil = require("@util/validateUtil.js");
 
 const User = require("@model/user.model.js");
 
 async function signUp(req, res, next) {
-  //Body is missing
-  console.log(req.body);
-  if (!req.body) {
-    let err = createError(400, "Req.body is missing");
-    return next(err);
-  }
-
   // Return if data is not valid
-  const validation = validateJs.validateUserData(req.body);
+  const validation = validateUtil.validateUserData(req.body);
   if (validation.valid === false) {
     //Data is not valid
     const message = {
@@ -27,7 +20,7 @@ async function signUp(req, res, next) {
   }
 
   // Trim spaces
-  const userData = validateJs.trimUserData(req.body);
+  const userData = validateUtil.trimUserData(req.body);
 
   // check if userName exist
   let existingUserName;
@@ -86,6 +79,7 @@ async function signUp(req, res, next) {
   } catch (error) {
     return next(createError(500, "Sign up failed."));
   }
+
 
   return res.json(JSON.stringify({ success: true }));
 }

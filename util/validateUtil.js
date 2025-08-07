@@ -60,7 +60,33 @@ function trimUserData(userData) {
   return trimmedUserData;
 }
 
+function validateAircraftData(aircraftData) {
+  if (
+    !(
+      aircraftData.aircraftType &&
+      aircraftData.aircraftRegistration &&
+      aircraftData.aircraftBuildDate &&
+      aircraftData.aircraftModel
+    )
+  ) {
+    // One of the mandatory fields is missing
+    return { valid: false, message: "Data is missing" };
+  }
+
+  if (aircraftData.aircraftRegistration.length != 6) {
+    //Registration is not valid
+    return { valid: false, message: "Aircraft Registration is not valid" };
+  }
+
+  // if (!(aircraftData.aircraftBuildDate instanceof Date)) {
+  //   //Date is not valid
+  //   return { valid: false, message: "Date is not valid" };
+  // }
+  return { valid: true };
+}
+
 module.exports = {
   validateUserData: validateUserData,
   trimUserData: trimUserData,
+  validateAircraftData: validateAircraftData,
 };

@@ -6,9 +6,25 @@ info:
   description: An API for Applied Computing Innovative solution project
 servers:
   - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Optional, for documentation purposes
+
+tags:
+  - name: Auth
+    description: Authentication of User
+  - name: Aircraft
+    description: Aircraft management
+
 paths:
   /auth/signup:
     post:
+      tags:
+        - Auth
       summary: Signing up the user
       description: Adds a user to the system
       requestBody:
@@ -54,6 +70,8 @@ paths:
           description: User or password is incorrect
   /auth/login:
     post:
+      tags:
+        - Auth
       summary: Login the user
       requestBody:
         required: true
@@ -70,7 +88,16 @@ paths:
                   type: string
       responses:
         "200":
-          description: User login successfully
+          description: |
+            User Successfully logged
+            In JWT   
+            { isAuth: true,
+              user: {
+                userName: existingUser.userName,
+                email: existingUser.email,
+                _id: existingUser._id,
+              }
+               after in any path with authen, this is added in req.auth
           content:
             application/json:
               schema:
@@ -80,7 +107,57 @@ paths:
                     type: string
                   success:
                     type: boolean
+
         "400":
           description: Invalid input
         "409":
           description: User or password is incorrect
+  /testAuth:
+    get:
+      tags:
+        - Auth
+      summary: test if authentication works
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: success
+        "403":
+          description: Unautheticated
+  /aircraft/new:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Aircraft
+      description: Add Aircraft to the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                aircraftType:
+                  type: string
+                aircraftRegistration:
+                  type: string
+                aircraftBuildDate:
+                  type: string
+                  format: date
+                aircraftModel:
+                  type: string
+      responses:
+        "200":
+          description: Aircraft added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "400":
+          description: Invalid input
+        "409":
+          description: User name does not exist

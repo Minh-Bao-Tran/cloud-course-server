@@ -21,6 +21,7 @@ const errorHandlingMiddleware = require("@middleware/error.middleware.js");
 
 //routes
 const authRoutes = require("@route/auth.route.js");
+const aircraftRoutes = require("@route/aircraft.route.js");
 
 const app = express();
 
@@ -36,7 +37,8 @@ app.use("/auth", authRoutes);
 
 app.use(authenticateMiddleware); // Any routes that requires authentication is behind this line
 
-app.get("/test", function (req, res) {
+app.use("/aircraft", aircraftRoutes);
+app.get("/testAuth", function (req, res) {
   console.log(req.userData);
   return res.send("success");
 });
