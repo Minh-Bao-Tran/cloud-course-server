@@ -8,16 +8,15 @@ const validateJs = require("@util/validateUserData.js");
 const User = require("@model/user.model.js");
 
 async function signUp(req, res, next) {
-  const userData = req.body;
-
   //Body is missing
+  console.log(req.body);
   if (!req.body) {
     let err = createError(400, "Req.body is missing");
     return next(err);
   }
 
-  // Return if Confirmed password doesn't match
-  const validation = validateJs.validateUserData(userData);
+  // Return if data is not valid
+  const validation = validateJs.validateUserData(req.body);
   if (validation.valid === false) {
     //Data is not valid
     const message = {
@@ -26,6 +25,9 @@ async function signUp(req, res, next) {
     const err = createError(400, message);
     return next(err);
   }
+
+  // Trim spaces
+  const userData = validateJs.trimUserData(req.body);
 
   // check if userName exist
   let existingUserName;
@@ -85,7 +87,7 @@ async function signUp(req, res, next) {
     return next(createError(500, "Sign up failed."));
   }
 
-  return res.json(JSON.stringify({ message: result, success: true }));
+  return res.json(JSON.stringify({ success: true }));
 }
 
 async function logIn(req, res, next) {
@@ -113,8 +115,6 @@ async function logIn(req, res, next) {
     //No logging in field is provided
     return next(createError(400));
   }
-
-  console.log("here");
   let existingUser;
   try {
     if (loginType == "userName") {

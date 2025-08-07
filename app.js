@@ -2,17 +2,31 @@ require("dotenv").config();
 
 const express = require("express");
 
+//Swagger
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+
+//shorthand naming scheme
 const moduleAlias = require("module-alias/register");
+
+//cookie
 const cookieParser = require("cookie-parser");
 
+//database
 const db = require("@data/database.js");
 
+//middleware
 const authenticateMiddleware = require("@middleware/authenticate.middleware.js");
 const errorHandlingMiddleware = require("@middleware/error.middleware.js");
 
+//routes
 const authRoutes = require("@route/auth.route.js");
 
 const app = express();
+
+// Load YAML Swagger file and serve swagger
+const swaggerDocument = YAML.load("./swagger.yaml");
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.urlencoded({ extended: false })); // Help to parse the body if a request is of POST Method
 app.use(express.json()); //Help to parse the request in JSON format

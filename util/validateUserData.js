@@ -28,6 +28,13 @@ function validateUserData(userData) {
     return { valid: false, message: "Email is not valid" };
     alse;
   }
+  const regex = /[^a-zA-Z0-9_]/;
+  if (regex.test(userData.userName)) {
+    return {
+      valid: false,
+      message: "Username should not contains a special character",
+    };
+  }
 
   const mobile = Number(userData.mobile);
   if (
@@ -36,13 +43,24 @@ function validateUserData(userData) {
     userData.mobile.length < 8
   ) {
     //Mobile Number is not valid
-    console.log();
     return { valid: false, message: "Mobile number is not valid" };
   }
 
   return { valid: true };
 }
 
+function trimUserData(userData) {
+  const trimmedUserData = { ...userData };
+  trimmedUserData.userName = userData.userName.trim();
+  trimmedUserData.password = userData.password.trim();
+  trimmedUserData.confirmedPassword = userData.confirmedPassword.trim();
+  trimmedUserData.email = userData.email.trim();
+  trimmedUserData.mobile = userData.mobile.trim();
+
+  return trimmedUserData;
+}
+
 module.exports = {
   validateUserData: validateUserData,
+  trimUserData: trimUserData,
 };
