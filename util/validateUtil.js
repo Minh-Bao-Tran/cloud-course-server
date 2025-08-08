@@ -78,10 +78,11 @@ function validateAircraftData(aircraftData) {
     return { valid: false, message: "Aircraft Registration is not valid" };
   }
 
-  // if (!(aircraftData.aircraftBuildDate instanceof Date)) {
-  //   //Date is not valid
-  //   return { valid: false, message: "Date is not valid" };
-  // }
+  const dateCheck = new Date(aircraftData.aircraftBuildDate);
+  if (isNaN(dateCheck.valueOf())) {
+    //Date is not valid
+    return { valid: false, message: "Date is not valid" };
+  }
   return { valid: true };
 }
 

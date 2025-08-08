@@ -161,3 +161,64 @@ paths:
           description: Invalid input
         "409":
           description: User name does not exist
+  /aircraft/{aircraftId}:
+    get:
+      parameters:
+        - in: path
+          name: aircraftId
+          required: true
+          schema:
+            type: string
+            format: ObjectId
+      tags:
+        - Aircraft
+      summary: Get one Aircraft, must belong to the user, userId already in JWT attached to the header
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aircraftType:
+                    type: string
+                  aircraftRegistration:
+                    type: string
+                  aircraftBuildDate:
+                    type: string
+                    format: date
+                  aircraftModel:
+                    type: string
+        "403":
+          description: Unauthenticated
+  /aircraft/all:
+    get:
+      tags:
+        - Aircraft
+      summary: Get all Aircraft from 
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                  items:
+                    type: object
+                    properties:
+                      aircraftType:
+                        type: string
+                      aircraftRegistration:
+                        type: string
+                      aircraftBuildDate:
+                        type: string
+                        format: date
+                      aircraftModel:
+                        type: string
+        "403":
+          description: Unauthenticated

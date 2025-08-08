@@ -5,10 +5,11 @@ const checkReqBody = require("@middleware/checkReqBody.middleware.js");
 
 const router = express.Router();
 
-//baseURL => /airport
-router.get("/:aircraftId", (req, res) => {
-  res.send("not supported");
-});
+//baseURL => /aircraft
+
+router.get("/all", aircraftController.getAllUserAircraft);
+
+router.get("/:aircraftId", aircraftController.getOneAircraft);
 
 router.post("/new", checkReqBody, aircraftController.addAircraft);
 

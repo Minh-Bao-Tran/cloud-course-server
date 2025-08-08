@@ -17,7 +17,6 @@ function authenticate(req, res, next) {
   } catch (error) {
     next(createError(403, "User is not authenticated"));
   }
-
   req.auth = result; //Add userData to request so it is easily accessed by other middleware/routes
 
   next();
