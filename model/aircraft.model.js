@@ -3,12 +3,12 @@ const mongodb = require("mongodb");
 
 class Aircraft {
   constructor(
-    aircraftType,
-    aircraftRegistration,
-    aircraftBuildDate,
-    aircraftModel,
-    userId = null,
-    _id = null
+    aircraftType, //String
+    aircraftRegistration, //String, length == 6
+    aircraftBuildDate, //String, to be converted into Date
+    aircraftModel, //String
+    userId = null, //ObjectId
+    _id = null //ObjectId
   ) {
     this._id = _id;
     this.aircraftType = aircraftType;

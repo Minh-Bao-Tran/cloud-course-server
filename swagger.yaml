@@ -19,6 +19,8 @@ tags:
     description: Authentication of User
   - name: Aircraft
     description: Aircraft management
+  - name: Static
+    description: Initialise the app with data
 
 paths:
   /auth/signup:
@@ -124,7 +126,7 @@ paths:
           description: success
         "403":
           description: Unautheticated
-  /aircraft/new:
+  /aircrafts/new:
     post:
       security:
         - BearerAuth: []
@@ -161,7 +163,7 @@ paths:
           description: Invalid input
         "409":
           description: User name does not exist
-  /aircraft/{aircraftId}:
+  /aircrafts/{aircraftId}:
     get:
       parameters:
         - in: path
@@ -194,7 +196,7 @@ paths:
                     type: string
         "403":
           description: Unauthenticated
-  /aircraft/all:
+  /aircrafts/all:
     get:
       tags:
         - Aircraft
@@ -207,18 +209,31 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                  items:
-                    type: object
-                    properties:
-                      aircraftType:
-                        type: string
-                      aircraftRegistration:
-                        type: string
-                      aircraftBuildDate:
-                        type: string
-                        format: date
-                      aircraftModel:
-                        type: string
+                type: object
+                properties:
+                  aircrafts: 
+                    type: array
+                      items:
+                        type: object
+                        properties:
+                          aircraftType:
+                            type: string
+                          aircraftRegistration:
+                            type: string
+                          aircraftBuildDate:
+                            type: string
+                            format: date
+                          aircraftModel:
+                            type: string
         "403":
           description: Unauthenticated
+  /static/fetchAllAirports:
+      get:
+        tags:
+          - Static
+        summary: Fetch all airport from RapidAPI and store it to the database
+        responses:
+          "200":
+            description: No data existed yet and data is added to database
+          "400":
+            description: Data already existed

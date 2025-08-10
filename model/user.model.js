@@ -3,11 +3,11 @@ const mongodb = require("mongodb");
 
 class User {
   constructor(
-    userName,
-    hashedPassword,
-    email = null,
-    mobile = null,
-    _id = null
+    userName, //String, No special character
+    hashedPassword, //String
+    email = null, //String, must contain @ and ,
+    mobile = null, //String, length == 10
+    _id = null //ObjectId
   ) {
     this._id = _id;
     this.userName = userName;

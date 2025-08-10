@@ -83,7 +83,6 @@ async function getOneAircraft(req, res, next) {
       )
     );
   }
-  console.log(fetchedAircraft);
 
   res.json(JSON.stringify(fetchedAircraft));
 }
@@ -106,8 +105,6 @@ async function getAllUserAircraft(req, res, next) {
     // No aircraft
     return next(createHttpError(400, "Aircraft does not exist"));
   }
-  console.log(fetchedAircrafts);
-
   res.json(JSON.stringify({ aircrafts: fetchedAircrafts }));
 }
 

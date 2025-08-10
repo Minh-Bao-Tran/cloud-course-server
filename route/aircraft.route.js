@@ -5,7 +5,7 @@ const checkReqBody = require("@middleware/checkReqBody.middleware.js");
 
 const router = express.Router();
 
-//baseURL => /aircraft
+//baseURL => /aircrafts
 
 router.get("/all", aircraftController.getAllUserAircraft);
 

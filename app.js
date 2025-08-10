@@ -22,6 +22,10 @@ const errorHandlingMiddleware = require("@middleware/error.middleware.js");
 //routes
 const authRoutes = require("@route/auth.route.js");
 const aircraftRoutes = require("@route/aircraft.route.js");
+const routeRoutes = require("@route/route.route.js");
+
+//Use Once:
+const fetchAllAirportsRoute = require("@route/airportStatic.route.js");
 
 const app = express();
 
@@ -33,11 +37,15 @@ app.use(express.urlencoded({ extended: false })); // Help to parse the body if a
 app.use(express.json()); //Help to parse the request in JSON format
 app.use(cookieParser()); //Help to parse the cookie
 
+app.use("/static", fetchAllAirportsRoute); //Initialise the app, only use once
+
 app.use("/auth", authRoutes);
 
 app.use(authenticateMiddleware); // Any routes that requires authentication is behind this line
 
-app.use("/aircraft", aircraftRoutes);
+app.use("/aircrafts", aircraftRoutes);
+app.use("/routes", routeRoutes);
+
 app.get("/testAuth", function (req, res) {
   console.log(req.userData);
   return res.send("success");
