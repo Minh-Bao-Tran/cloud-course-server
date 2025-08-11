@@ -44,7 +44,7 @@ app.use("/auth", authRoutes);
 app.use(authenticateMiddleware); // Any routes that requires authentication is behind this line
 
 app.use("/aircrafts", aircraftRoutes);
-app.use("/routes", routeRoutes);
+app.use("/route", routeRoutes);
 
 app.get("/testAuth", function (req, res) {
   console.log(req.userData);

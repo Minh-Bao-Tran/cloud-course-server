@@ -21,6 +21,8 @@ tags:
     description: Aircraft management
   - name: Static
     description: Initialise the app with data
+  - name: Route
+    description: Create Route for each Aircraft
 
 paths:
   /auth/signup:
@@ -213,18 +215,18 @@ paths:
                 properties:
                   aircrafts: 
                     type: array
-                      items:
-                        type: object
-                        properties:
-                          aircraftType:
-                            type: string
-                          aircraftRegistration:
-                            type: string
-                          aircraftBuildDate:
-                            type: string
-                            format: date
-                          aircraftModel:
-                            type: string
+                    items:
+                     type: object
+                     properties:
+                      aircraftType:
+                        type: string
+                      aircraftRegistration:
+                        type: string
+                      aircraftBuildDate:
+                        type: string
+                        format: date
+                      aircraftModel:
+                        type: string
         "403":
           description: Unauthenticated
   /static/fetchAllAirports:
@@ -237,3 +239,51 @@ paths:
             description: No data existed yet and data is added to database
           "400":
             description: Data already existed
+  /route/new:
+    post: 
+      security:
+        - BearerAuth: []
+      tags:
+        - Route
+      description: Add Route to the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                departingAirport:
+                  type: string
+                  format: ICAO or YATA code
+                arrivingAirport:
+                  type: string
+                  format: ICAO or YATA code
+                waypoints:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      lon:
+                        type: number
+                      lat: 
+                        type: number
+                departingDate:
+                  type: string
+                  format: date
+                arrivingDate:
+                  type: string
+                  format: date
+                aircraftId:
+                  type: string
+                  format: ObjectId
+      responses:
+        "200":
+          description: Route added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean

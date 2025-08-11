@@ -86,8 +86,13 @@ function validateAircraftData(aircraftData) {
   return { valid: true };
 }
 
+function validateRouteData(routeData) {
+  return true;
+}
+
 module.exports = {
   validateUserData: validateUserData,
-  trimUserData: trimUserData,
+   trimUserData: trimUserData,
   validateAircraftData: validateAircraftData,
+  validateRouteData: validateRouteData,
 };
