@@ -1,7 +1,9 @@
 const db = require("../data/database.js");
 
 const mongodb = require("mongodb");
-const { getDistance } = require("geolib");
+const { getDistance, getGreatCircleBearing } = require("geolib");
+
+const { fetchWeather } = require("@util/weatherUtil.js");
 
 class Route {
   constructor(
@@ -19,30 +21,39 @@ class Route {
     this._id = _id;
     this.departingAirport = departingAirport;
     this.arrivingAirport = arrivingAirport;
-    this.arrivingAirport = arrivingAirport;
     this.arrivingDate = new Date(arrivingDate);
     this.departingDate = new Date(departingDate);
     this.aircraftId = aircraftId;
     this.userId = userId;
     this.waypoints = [...waypoints];
+    // final waypoint would be of the format:
+    // {
+    //   lat: float,
+    //   lon: float
+    //   distance: float, knot
+    //   direction: float, compass bearing
+    //   relativeAircraftDir: to keep the course, to direction
+    //   weather: {
+    //     message: condition.text from API
+    //     windSpeed: float, knot,
+    //     direction: compass, bearing
+    //     cloud: ;
+    //     gust: knot
+    //     visibility: in km
+    //   }
+    // }
     this.distance = distance;
     this.active = active;
   }
 
-  async addAirportToWaypoints() {
-    const arrivingAirport = await Route.fetchAirportByIATA(
-      this.arrivingAirport
-    );
-    const departingAirport = await Route.fetchAirportByIATA(
-      this.departingAirport
-    );
-    this.waypoints.push({ lon: arrivingAirport.lon, lat: arrivingAirport.lat });
-    this.waypoints.push({
-      lon: departingAirport.lon,
-      lat: departingAirport.lat,
-    });
+  modifyAirportData() {
+    this.departingAirport = this.departingAirport.toUpperCase();
+    this.arrivingAirport = this.arrivingAirport.toUpperCase();
   }
-  calculateDistance() {
+
+  calcAllDistanceAndDirection() {
+    let newWaypoints = [];
+
     let totalDistance = 0;
     for (let i = 0; i <= this.waypoints.length - 2; i++) {
       // i - 1 as distance needs 2 points 2 calc, therefore the last point would not be valid for distance calc
@@ -55,12 +66,49 @@ class Route {
         latitude: this.waypoints[i + 1].lat,
         longitude: this.waypoints[i + 1].lon,
       };
-      const distance = getDistance(currentPoint, nextPoint);
-      //return point in meter
-      totalDistance += distance / 1000 / 1.852;
-      //total distance is in knot
+      const distance = getDistance(currentPoint, nextPoint) / 1000 / 1.852;
+      //return point in meter, convert in to knot
+      const direction = getGreatCircleBearing(currentPoint, nextPoint);
+
+      totalDistance += distance;
+
+      const newWaypoint = {
+        ...currentPoint,
+        direction: direction,
+        distance: distance,
+      };
+      newWaypoints.push(newWaypoint);
     }
     this.distance = totalDistance;
+    this.waypoints = newWaypoints;
+  }
+
+  async fetchWindDataForAllWaypoints() {
+    this.waypoints = this.waypoints.map(async function (waypoint) {
+      let weather;
+      try {
+        weather = await fetchWeather({ lat: waypoint.lat, lon: waypoint.lon });
+      } catch (error) {
+        return { success: false, error: error };
+      }
+
+      const newWaypoint = { ...waypoint };
+    });
+  }
+
+  async addAirportToWaypoints() {
+    const arrivingAirport = await Route.fetchAirportByIATA(
+      this.arrivingAirport
+    );
+    const departingAirport = await Route.fetchAirportByIATA(
+      this.departingAirport
+    );
+    console.log(arrivingAirport);
+    this.waypoints.push({ lon: arrivingAirport.lon, lat: arrivingAirport.lat });
+    this.waypoints.push({
+      lon: departingAirport.lon,
+      lat: departingAirport.lat,
+    });
   }
 
   async addRoutes(collection = "routes") {

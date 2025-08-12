@@ -26,3 +26,6 @@
     docker-compose down
     # docker run -d -p 3000:3000 --name cloud-course-server -v $(pwd):/app cloud-course-server
 ```
+
+# Speed and distance is in knot
+# descent and climb rate is in feet per minute

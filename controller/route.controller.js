@@ -13,10 +13,17 @@ async function addNewRoute(req, res, next) {
   }
   const routeData = req.body;
 
-  if (!validateUtil.validateRouteData(routeData)) {
-    return next(createHttpError(400, "Route data is not valid"));
+  const validation = validateUtil.validateRouteData(req.body);
+  if (validation.valid === false) {
+    //Data is not valid
+    const message = {
+      message: validation.message,
+    };
+    const err = createHttpError(400, message);
+    return next(err);
   }
 
+  //Checking Aircraft
   let aircraftId;
   let userId;
 
@@ -39,11 +46,28 @@ async function addNewRoute(req, res, next) {
     return next(400, "Aircraft does not exist");
   }
 
+  //Checking Airport
+  const arrivingAirportCode = routeData.arrivingAirport.toUpperCase();
+  const departingAirportCode = routeData.departingAirport.toUpperCase();
+
+  let arrivingAirport;
+  let departingAirport;
+  try {
+    arrivingAirport = await Route.fetchAirportByIATA(arrivingAirportCode);
+    departingAirport = await Route.fetchAirportByIATA(departingAirportCode);
+  } catch (error) {
+    next(error);
+  }
+  if (!arrivingAirport || !departingAirport) {
+    //Airport is not in database
+    return next(createHttpError(400, "Airport is not in database"));
+  }
+
   //Create the route object
   const routeId = new mongodb.ObjectId();
   const route = new Route(
-    routeData.departingAirport,
-    routeData.arrivingAirport,
+    departingAirportCode,
+    arrivingAirportCode,
     routeData.waypoints,
     routeData.departingDate,
     routeData.arrivingDate,
@@ -51,14 +75,14 @@ async function addNewRoute(req, res, next) {
     userId,
     routeId
   );
+
   try {
     await route.addAirportToWaypoints();
   } catch (error) {
     next(error);
   }
-
-  // console.log(route);
-  route.calculateDistance();
+  route.calcAllDistanceAndDirection();
+  console.log(route);
 }
 
 module.exports = {

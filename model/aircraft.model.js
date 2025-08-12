@@ -8,7 +8,8 @@ class Aircraft {
     aircraftBuildDate, //String, to be converted into Date
     aircraftModel, //String
     userId = null, //ObjectId
-    _id = null //ObjectId
+    _id = null, //ObjectId
+    status = "inactive" // Status can have: active, inactive, parked, landed, ready
   ) {
     this._id = _id;
     this.aircraftType = aircraftType;
@@ -16,6 +17,7 @@ class Aircraft {
     this.aircraftBuildDate = new Date(aircraftBuildDate);
     this.aircraftModel = aircraftModel;
     this.userId = userId;
+    this.status = status;
   }
   async addAircraft(collection = "aircrafts") {
     const result = await db.getDb().collection(collection).insertOne(this);

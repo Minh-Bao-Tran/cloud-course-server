@@ -11,6 +11,8 @@ const moduleAlias = require("module-alias/register");
 
 //cookie
 const cookieParser = require("cookie-parser");
+//Cross-Origin allowed
+const cors = require("cors");
 
 //database
 const db = require("@data/database.js");
@@ -29,6 +31,8 @@ const fetchAllAirportsRoute = require("@route/airportStatic.route.js");
 
 const app = express();
 
+//Cross-Origined allowed
+app.use(cors());
 // Load YAML Swagger file and serve swagger
 const swaggerDocument = YAML.load("./swagger.yaml");
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -46,9 +50,11 @@ app.use(authenticateMiddleware); // Any routes that requires authentication is b
 app.use("/aircrafts", aircraftRoutes);
 app.use("/route", routeRoutes);
 
-app.get("/testAuth", function (req, res) {
-  console.log(req.userData);
-  return res.send("success");
+const { fetchWeather } = require("@util/weatherUtil.js");
+app.get("/testAuth", async function (req, res) {
+  console.log(req.auth);
+  const weather = await fetchWeather({ lat: 53.1, lon: -0.13 });
+  return res.json(JSON.stringify(weather));
 });
 
 app.use(errorHandlingMiddleware); //Error handling middleware is always at the last position

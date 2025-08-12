@@ -87,12 +87,43 @@ function validateAircraftData(aircraftData) {
 }
 
 function validateRouteData(routeData) {
-  return true;
+  if (
+    !(
+      routeData.departingAirport &&
+      routeData.arrivingAirport &&
+      routeData.hasOwnProperty("waypoints") &&
+      routeData.departingDate &&
+      routeData.arrivingDate &&
+      routeData.aircraftId 
+    )
+  ) {
+    // One of the mandatory fields is missing
+    return { valid: false, message: "Data is missing" };
+  }
+
+  const dateCheckDepart = new Date(routeData.departingDate);
+  const dateCheckArrive = new Date(routeData.arrivingDate);
+
+  if (isNaN(dateCheckDepart.valueOf()) || isNaN(dateCheckArrive.valueOf())) {
+    //Date is not valid
+    return { valid: false, message: "Date is not valid" };
+  }
+
+  if (routeData.waypoints.length > 0) {
+    for (const waypoint of routeData.waypoints) {
+      // Lat or Lon is missing
+      if (!waypoint.hasOwnProperty("lat") || !waypoint.hasOwnProperty("lon")) {
+        return { valid: false, message: "Lon or lat is missing" };
+      }
+    }
+  }
+
+  return { valid: true };
 }
 
 module.exports = {
   validateUserData: validateUserData,
-   trimUserData: trimUserData,
+  trimUserData: trimUserData,
   validateAircraftData: validateAircraftData,
   validateRouteData: validateRouteData,
 };

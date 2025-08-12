@@ -19,10 +19,11 @@ tags:
     description: Authentication of User
   - name: Aircraft
     description: Aircraft management
-  - name: Static
-    description: Initialise the app with data
   - name: Route
     description: Create Route for each Aircraft
+  - name: Static
+    description: Initialise the app with data
+
 
 paths:
   /auth/signup:
