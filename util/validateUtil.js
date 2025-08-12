@@ -112,7 +112,7 @@ function validateRouteData(routeData) {
   if (routeData.waypoints.length > 0) {
     for (const waypoint of routeData.waypoints) {
       // Lat or Lon is missing
-      if (!waypoint.hasOwnProperty("lat") || !waypoint.hasOwnProperty("lon")) {
+      if (!waypoint.hasOwnProperty("latitude") || !waypoint.hasOwnProperty("longitude")) {
         return { valid: false, message: "Lon or lat is missing" };
       }
     }

@@ -265,9 +265,9 @@ paths:
                   items:
                     type: object
                     properties:
-                      lon:
+                      longitude:
                         type: number
-                      lat: 
+                      latitude: 
                         type: number
                 departingDate:
                   type: string

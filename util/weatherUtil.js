@@ -21,7 +21,7 @@ async function fetchWeather(position) {
   } catch (error) {
     return { valid: false, message: "Could not be fetched" };
   }
-  console.log(result);
+  console.log(response);
   return { valid: true, result: result };
 }
 

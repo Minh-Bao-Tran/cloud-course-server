@@ -82,6 +82,14 @@ async function addNewRoute(req, res, next) {
     next(error);
   }
   route.calcAllDistanceAndDirection();
+
+  const tryFetchWeather = await route.fetchWindDataForAllWaypoints();
+  //Return success or not
+  if (!tryFetchWeather.success) {
+    next(createHttpError(500, tryFetchWeather.error));
+  }
+
+  //Weather is successfully fetched and added to the route object
   console.log(route);
 }
 

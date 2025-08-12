@@ -1,44 +1,75 @@
 const db = require("../data/database.js");
 const mongodb = require("mongodb");
 
-class User {
+class Weather {
   constructor(
-    userName, //String, No special character
-    hashedPassword, //String
-    email = null, //String, must contain @ and ,
-    mobile = null, //String, length == 10
-    _id = null //ObjectId
+    windSpeed = 0, //Float, windspeed is in knot
+    direction = 0, //Float, true bearing
+    cloud = null,
+    gust = null,
+    visibility = null,
+    message = null
   ) {
-    this._id = _id;
-    this.userName = userName;
-    this.hashedPassword = hashedPassword;
-    this.email = email;
-    this.mobile = mobile;
+    this.windSpeed = windSpeed;
+    this.direction = direction;
+    this.cloud = cloud;
+    this.gust = gust;
+    this.visibility = visibility;
+    this.message = message;
   }
 
-  async signUpUser(collection = "users") {
-    const result = await db.getDb().collection(collection).insertOne(this);
-    return result;
-  }
-  async editUser() {}
+  static async fetchWeather(position) {
+    if (
+      !position.hasOwnProperty("latitude") ||
+      !position.hasOwnProperty("longitude")
+    ) {
+      return { valid: false, message: "lon or lat is missing" };
+    }
 
-  static async fetchUserByID(_id) {
-    //ID must already be in Object ID form
-    const result = await db.getDb().collection("users").findOne({ _id: _id });
-    return result;
-  }
+    const { longitude, latitude } = position;
+    const url = `https://weatherapi-com.p.rapidapi.com/current.json?q=${latitude},${longitude}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "x-rapidapi-key": "39ea5bf926msh2cb3030103be360p1e5d89jsncc0c878e486e",
+        "x-rapidapi-host": "weatherapi-com.p.rapidapi.com",
+      },
+    };
 
-  static async fetchUserByUserName(userName) {
-    const result = await db.getDb().collection("users").findOne({ userName: userName });
-    return result;
-  }
+    let response;
+    let result;
+    try {
+      response = await fetch(url, options);
+      if (response.status !== 200) {
+        //Response, the position for response is not available
+        //Create a null object with default value
+        return {
+          valid: true,
+          message: "Responded, not valid",
+          weather: new Weather(),
+        };
+      }
+      result = JSON.parse(await response.text());
+    } catch (error) {
+      return { valid: false, message: "Could not be fetched" };
+    }
+    const windSpeed = result.current.wind_kph / 1.852; // Convert into knot
+    const direction = result.current.wind_degree;
+    const cloud = result.current.cloud;
+    const gust = result.current.gust_kph / 1.852; // Convert into knot
+    const visibility = result.current.vis_km;
+    const message = result.current.condition.text;
 
-  static async fetchUserByEmail(email) {
-    const result = await db.getDb().collection("users").findOne({ email: email });
-    return result;
+    const weather = new Weather(
+      windSpeed,
+      direction,
+      cloud,
+      gust,
+      visibility,
+      message
+    );
+    return { valid: true, weather: weather };
   }
-
-  async fetchPilotDetails() {}
 }
 
-module.exports = User;
+module.exports = Weather;

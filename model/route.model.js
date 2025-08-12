@@ -3,8 +3,7 @@ const db = require("../data/database.js");
 const mongodb = require("mongodb");
 const { getDistance, getGreatCircleBearing } = require("geolib");
 
-const { fetchWeather } = require("@util/weatherUtil.js");
-
+const Weather = require("@model/weather.model.js");
 class Route {
   constructor(
     departingAirport, //Airport Code
@@ -28,8 +27,8 @@ class Route {
     this.waypoints = [...waypoints];
     // final waypoint would be of the format:
     // {
-    //   lat: float,
-    //   lon: float
+    //   latitude: float,
+    //   longitude: float
     //   distance: float, knot
     //   direction: float, compass bearing
     //   relativeAircraftDir: to keep the course, to direction
@@ -59,19 +58,20 @@ class Route {
       // i - 1 as distance needs 2 points 2 calc, therefore the last point would not be valid for distance calc
       //Point should contain lon and lat
       const currentPoint = {
-        latitude: this.waypoints[i].lat,
-        longitude: this.waypoints[i].lon,
+        latitude: this.waypoints[i].latitude,
+        longitude: this.waypoints[i].longitude,
       };
       const nextPoint = {
-        latitude: this.waypoints[i + 1].lat,
-        longitude: this.waypoints[i + 1].lon,
+        latitude: this.waypoints[i + 1].latitude,
+        longitude: this.waypoints[i + 1].longitude,
       };
       const distance = getDistance(currentPoint, nextPoint) / 1000 / 1.852;
+      totalDistance += distance;
       //return point in meter, convert in to knot
+
       const direction = getGreatCircleBearing(currentPoint, nextPoint);
 
-      totalDistance += distance;
-
+      //Update the information for waypoint
       const newWaypoint = {
         ...currentPoint,
         direction: direction,
@@ -80,34 +80,58 @@ class Route {
       newWaypoints.push(newWaypoint);
     }
     this.distance = totalDistance;
-    this.waypoints = newWaypoints;
+    this.waypoints = [
+      ...newWaypoints,
+      this.waypoints[this.waypoints.length - 1],
+    ];
+    //Last waypoint is not valid for distance and angle calculation, so it should be added later
   }
 
   async fetchWindDataForAllWaypoints() {
-    this.waypoints = this.waypoints.map(async function (waypoint) {
+    const newWaypoints = [];
+    for (const waypoint of this.waypoints) {
       let weather;
       try {
-        weather = await fetchWeather({ lat: waypoint.lat, lon: waypoint.lon });
+        const result = await Weather.fetchWeather({
+          latitude: waypoint.latitude,
+          longitude: waypoint.longitude,
+        });
+        if (!result.valid) {
+          //result is not valid
+          return {
+            success: false,
+            error: "Something went wrong, cannot fetch weather",
+          };
+        }
+
+        weather = result.weather;
       } catch (error) {
         return { success: false, error: error };
       }
-
-      const newWaypoint = { ...waypoint };
-    });
+      const newWaypoint = { ...waypoint, weather: weather };
+      newWaypoints.push(newWaypoint);
+    }
+    this.waypoints = newWaypoints;
+    return { success: true };
   }
 
   async addAirportToWaypoints() {
-    const arrivingAirport = await Route.fetchAirportByIATA(
-      this.arrivingAirport
-    );
     const departingAirport = await Route.fetchAirportByIATA(
       this.departingAirport
     );
-    console.log(arrivingAirport);
-    this.waypoints.push({ lon: arrivingAirport.lon, lat: arrivingAirport.lat });
+    const arrivingAirport = await Route.fetchAirportByIATA(
+      this.arrivingAirport
+    );
+
+    //data from the airport, the key is shortened as for the API
+
     this.waypoints.push({
-      lon: departingAirport.lon,
-      lat: departingAirport.lat,
+      longitude: departingAirport.lon,
+      latitude: departingAirport.lat,
+    });
+    this.waypoints.push({
+      longitude: arrivingAirport.lon,
+      latitude: arrivingAirport.lat,
     });
   }
 
