@@ -1,6 +1,3 @@
-const db = require("../data/database.js");
-const mongodb = require("mongodb");
-
 class Weather {
   constructor(
     windSpeed = 0, //Float, windspeed is in knot

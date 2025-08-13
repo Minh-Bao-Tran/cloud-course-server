@@ -2,6 +2,7 @@ const db = require("../data/database.js");
 
 const mongodb = require("mongodb");
 const { getDistance, getGreatCircleBearing } = require("geolib");
+const { addDecimalTime } = require("@util/timeUtil.js");
 
 const Weather = require("@model/weather.model.js");
 class Route {
@@ -15,6 +16,7 @@ class Route {
     userId, //ObjectId
     _id, //ObjectId
     distance = 0,
+    time = 0,
     active = false
   ) {
     this._id = _id;
@@ -32,6 +34,7 @@ class Route {
     //   distance: float, knot
     //   direction: float, compass bearing
     //   relativeAircraftDir: to keep the course, to direction
+    //   airspeed: = aircraft speed + windSpeed, using vector addition(both of the are vector quantities)
     //   weather: {
     //     message: condition.text from API
     //     windSpeed: float, knot,
@@ -42,6 +45,7 @@ class Route {
     //   }
     // }
     this.distance = distance;
+    this.time = time;
     this.active = active;
   }
 
@@ -50,7 +54,66 @@ class Route {
     this.arrivingAirport = this.arrivingAirport.toUpperCase();
   }
 
-  calcAllDistanceAndDirection() {
+  calcRelativeDirectionAndSpeed() {
+    let newWaypoints = [];
+    for (let i = 0; i <= this.waypoints.length - 2; i++) {
+      // i - 1 as distance needs 2 points 2 calc, therefore the last point would not be valid for distance calc
+
+      const currentPoint = this.waypoints[i];
+      //Waypoint should already have weather
+
+      const windSpeed = currentPoint.weather.windSpeed;
+      const windDirection = currentPoint.weather.direction * (Math.PI / 180); //Converting to radians
+
+      const finalDirection = currentPoint.direction * (Math.PI / 180);
+      const aircraftSpeed = 120; //(cessna 172)
+
+      console.log(currentPoint.weather);
+      console.log(finalDirection, aircraftSpeed, windDirection, windSpeed);
+      let aircraftTrueDirection =
+        finalDirection +
+        Math.PI -
+        Math.asin(
+          (windSpeed / aircraftSpeed) * Math.sin(finalDirection - windDirection)
+        );
+
+      let trueAirspeed =
+        (windSpeed * Math.sin(windDirection) +
+          aircraftSpeed * Math.sin(aircraftTrueDirection)) /
+        Math.sin(finalDirection);
+      if (trueAirspeed < 0) {
+        //Reversed everything on the unit circle if the speed is negative
+        aircraftTrueDirection = aircraftTrueDirection - Math.PI;
+        trueAirspeed = -trueAirspeed;
+      }
+      const relativeAircraftDirInRadian =
+        aircraftTrueDirection - finalDirection;
+
+      const relativeAircraftDirInDegrees =
+        (relativeAircraftDirInRadian / Math.PI) * 180;
+
+      console.log(
+        "relativeDir: ",
+        relativeAircraftDirInDegrees,
+        " trueAirspeed: ",
+        trueAirspeed
+      );
+
+      const newWaypoint = {
+        ...currentPoint,
+        relativeAircraftDir: relativeAircraftDirInDegrees,
+        airspeed: trueAirspeed,
+      };
+      newWaypoints.push(newWaypoint);
+    }
+    this.waypoints = [
+      ...newWaypoints,
+      this.waypoints[this.waypoints.length - 1],
+    ];
+    //Last waypoint is not valid for distance and angle calculation, so it should be added later
+  }
+
+  calcTrueDistanceAndSpeed() {
     let newWaypoints = [];
 
     let totalDistance = 0;
@@ -84,7 +147,41 @@ class Route {
       ...newWaypoints,
       this.waypoints[this.waypoints.length - 1],
     ];
-    //Last waypoint is not valid for distance and angle calculation, so it should be added later
+  }
+
+  calcTime() {
+    let newWaypoints = [];
+
+    let totalTime = 0;
+    for (let i = 0; i <= this.waypoints.length - 2; i++) {
+      // i - 1 as distance needs 2 points 2 calc, therefore the last point would not be valid for distance calc
+      //Point should contain lon and lat
+      const currentPoint = this.waypoints[i];
+      const time = currentPoint.distance / currentPoint.airspeed;
+
+      totalTime += time;
+
+      //Update the information for waypoint
+      const newWaypoint = {
+        ...currentPoint,
+        time: time,
+      };
+      newWaypoints.push(newWaypoint);
+    }
+    this.time = totalTime;
+    this.waypoints = [
+      ...newWaypoints,
+      this.waypoints[this.waypoints.length - 1],
+    ];
+  }
+
+  calcArrivingTime() {
+    const departingTime = this.departingDate;
+    const time = this.time;
+
+    const arrivingTime = addDecimalTime(departingTime, time, "hour")["$d"]; // get in the date format
+    console.log(new Date());
+    this.arrivingDate = arrivingTime;
   }
 
   async fetchWindDataForAllWaypoints() {

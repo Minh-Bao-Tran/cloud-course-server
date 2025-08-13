@@ -271,10 +271,10 @@ paths:
                         type: number
                 departingDate:
                   type: string
-                  format: date
+                  format: date-time
                 arrivingDate:
                   type: string
-                  format: date
+                  format: date-time
                 aircraftId:
                   type: string
                   format: ObjectId

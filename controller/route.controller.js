@@ -12,7 +12,6 @@ async function addNewRoute(req, res, next) {
     next(createHttpError(500, "Internal Error"));
   }
   const routeData = req.body;
-
   const validation = validateUtil.validateRouteData(req.body);
   if (validation.valid === false) {
     //Data is not valid
@@ -43,7 +42,7 @@ async function addNewRoute(req, res, next) {
 
   if (!aircraft) {
     //Aircraft doesn't exist
-    return next(400, "Aircraft does not exist");
+    return next(createHttpError(400, "Aircraft does not exist"));
   }
 
   //Checking Airport
@@ -81,7 +80,7 @@ async function addNewRoute(req, res, next) {
   } catch (error) {
     next(error);
   }
-  route.calcAllDistanceAndDirection();
+  route.calcTrueDistanceAndSpeed();
 
   const tryFetchWeather = await route.fetchWindDataForAllWaypoints();
   //Return success or not
@@ -90,6 +89,9 @@ async function addNewRoute(req, res, next) {
   }
 
   //Weather is successfully fetched and added to the route object
+  route.calcRelativeDirectionAndSpeed();
+  route.calcTime();
+  route.calcArrivingTime();
   console.log(route);
 }
 
