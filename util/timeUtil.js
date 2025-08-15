@@ -29,7 +29,18 @@ function addDecimalTime(currentDate, amount, unit) {
   return result;
 }
 
+function compareTime(date1, date2) {
+  //return true if date2 is greater than date 1
 
+  const firstDate = dayjs(date1);
+  const secondDate = dayjs(date2);
 
+  const result = firstDate.diff(secondDate);
 
-module.exports = { addDecimalTime: addDecimalTime };
+  if (result < 0) {
+    return false
+  }
+  return true
+}
+
+module.exports = { addDecimalTime: addDecimalTime, compareTime: compareTime };

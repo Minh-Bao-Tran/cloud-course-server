@@ -42,6 +42,16 @@ class Aircraft {
 
     return result;
   }
+
+  static async updateAircraftStatus(aircraftId, status) {
+    const updatedDocument = {
+      $set: {
+        status: status
+      }
+    }
+    const result = await db.getDb().collection("aircrafts").updateOne({ _id: aircraftId }, updatedDocument)
+    return result;
+  }
 }
 
 module.exports = Aircraft;
