@@ -8,8 +8,9 @@ const router = express.Router();
 //Base Url => /routes
 router.post("/new", checkReqBody, routeController.addNewRoute);
 
-// router.get("/all", routeController.getOneRoute);
+// router.get("/all", routeController.logIn);
 
-// router.get("/:routeId", routeController.logIn);
+router.get("/:routeId", routeController.getOneRoute);
+
 
 module.exports = router;

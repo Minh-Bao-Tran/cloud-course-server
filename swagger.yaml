@@ -288,3 +288,20 @@ paths:
                 properties:
                   success:
                     type: boolean
+  /route/{routeId}:
+    get:
+      parameters:
+        - in: path
+          name: routeId
+          required: true
+          schema:
+            type: string
+            format: ObjectId
+      tags:
+        - Route
+      summary: Get one Route, must belong to the user, userId already in JWT attached to the header
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: success

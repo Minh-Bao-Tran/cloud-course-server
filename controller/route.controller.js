@@ -92,9 +92,50 @@ async function addNewRoute(req, res, next) {
   route.calcRelativeDirectionAndSpeed();
   route.calcTime();
   route.calcArrivingTime();
-  console.log(route);
+
+  let result;
+  try {
+    result = await route.addRoutes()
+  } catch (error) {
+    next(error)
+  }
+
+  res.json(JSON.parse({ success: result.success }))
+}
+
+async function getOneRoute(req, res, next) {
+  if (!req.auth) {
+    next(createHttpError(500, "Internal Error"));
+  }
+  let userId;
+  let routeId;
+  try {
+    userId = new mongodb.ObjectId(req.auth.user._id);
+    routeId = new mongodb.ObjectId(req.params.routeId);
+  } catch (error) {
+    return next(createHttpError(400, "Id is not valid"));
+  }
+
+  const fetchedRoute = await Route.fetchRouteByRouteId(
+    userId,
+    routeId
+  );
+
+  if (!fetchedRoute) {
+    // aircraft doesn't exist
+    return next(
+      createHttpError(
+        400,
+        "Route does not exist or Route does not belong to user"
+      )
+    );
+  }
+
+  res.json(JSON.stringify(fetchedRoute));
+
 }
 
 module.exports = {
   addNewRoute: addNewRoute,
+  getOneRoute: getOneRoute
 };
