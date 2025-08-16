@@ -271,6 +271,15 @@ class Route {
       .findOne({ iata: iataCode });
     return result;
   }
+
+  static async deleteOneRoute(userId, routeId){
+        const result = await db
+      .getDb()
+      .collection("routes")
+      .deleteOne({ _id: routeId, userId: userId });
+
+    return result;
+  }
 }
 
 module.exports = Route;

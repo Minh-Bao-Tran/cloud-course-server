@@ -9,7 +9,7 @@ const validateUtil = require("@util/validateUtil.js");
 
 async function addNewRoute(req, res, next) {
   if (!req.auth) {
-    next(createHttpError(500, "Internal Error"));
+    return next(createHttpError(500, "Internal Error, auth "));
   }
   const routeData = req.body;
   const validation = validateUtil.validateRouteData(req.body);
@@ -95,12 +95,12 @@ async function addNewRoute(req, res, next) {
 
   let result;
   try {
-    result = await route.addRoutes()
+    result = await route.addRoutes();
   } catch (error) {
-    next(error)
+    next(error);
   }
 
-  res.json(JSON.parse({ success: result.success }))
+  res.json(JSON.stringify({ success: result.acknowledged }));
 }
 
 async function getOneRoute(req, res, next) {
@@ -135,7 +135,34 @@ async function getOneRoute(req, res, next) {
 
 }
 
+async function updateRoute(){
+  if (!req.auth) {
+    next(createHttpError(500, "Internal Error"));
+  }
+}
+
+async function deleteOneRoute(req, res, next) {
+  //Req.body is 
+  if (!req.auth) {
+    next(createHttpError(500, "Internal Error"));
+  }
+  let userId;
+  let routeId;
+  try {
+    userId = new mongodb.ObjectId(req.auth.user._id);
+    routeId = new mongodb.ObjectId(req.params.routeId);
+  } catch (error) {
+    return next(createHttpError(400, "Id is not valid"));
+  }
+
+  const result = await Route.deleteOneRoute(userId, routeId);
+
+  res.json(JSON.stringify({ result: result }));
+}
+
 module.exports = {
   addNewRoute: addNewRoute,
-  getOneRoute: getOneRoute
+  getOneRoute: getOneRoute,
+  deleteOneRoute: deleteOneRoute,
+  updateRoute: updateRoute
 };

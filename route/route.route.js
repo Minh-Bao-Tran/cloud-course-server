@@ -6,11 +6,14 @@ const checkReqBody = require("@middleware/checkReqBody.middleware.js");
 const router = express.Router();
 
 //Base Url => /routes
-router.post("/new", checkReqBody, routeController.addNewRoute);
+router.post("/", checkReqBody, routeController.addNewRoute);
 
 // router.get("/all", routeController.logIn);
 
 router.get("/:routeId", routeController.getOneRoute);
 
+router.delete("/:routeId", routeController.deleteOneRoute);
+
+router.put("/:routeId", routeController.updateRoute)
 
 module.exports = router;

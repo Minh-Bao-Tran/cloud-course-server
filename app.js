@@ -48,7 +48,7 @@ app.use("/auth", authRoutes);
 app.use(authenticateMiddleware); // Any routes that requires authentication is behind this line
 
 app.use("/aircrafts", aircraftRoutes);
-app.use("/route", routeRoutes);
+app.use("/routes", routeRoutes);
 
 const Weather = require("@model/weather.model.js");
 app.get("/testAuth", async function (req, res) {

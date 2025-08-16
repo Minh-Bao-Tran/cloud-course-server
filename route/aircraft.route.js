@@ -7,10 +7,10 @@ const router = express.Router();
 
 //baseURL => /aircrafts
 
-router.get("/all", aircraftController.getAllUserAircraft);
+router.get("/", aircraftController.getAllUserAircraft);
+
+router.post("/", checkReqBody, aircraftController.addAircraft);
 
 router.get("/:aircraftId", aircraftController.getOneAircraft);
-
-router.post("/new", checkReqBody, aircraftController.addAircraft);
 
 module.exports = router;

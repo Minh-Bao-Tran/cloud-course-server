@@ -35,12 +35,12 @@ function compareTime(date1, date2) {
   const firstDate = dayjs(date1);
   const secondDate = dayjs(date2);
 
-  const result = firstDate.diff(secondDate);
+  const result = firstDate.diff(secondDate, "minute");
 
   if (result < 0) {
-    return false
+    return false;
   }
-  return true
+  return true;
 }
 
 module.exports = { addDecimalTime: addDecimalTime, compareTime: compareTime };

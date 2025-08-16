@@ -24,7 +24,6 @@ tags:
   - name: Static
     description: Initialise the app with data
 
-
 paths:
   /auth/signup:
     post:
@@ -129,8 +128,40 @@ paths:
           description: success
         "403":
           description: Unautheticated
-  /aircrafts/new:
+  /aircrafts:
+    get:
+      tags:
+        - Aircraft
+      summary: Get all Aircraft from
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  aircrafts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        aircraftType:
+                          type: string
+                        aircraftRegistration:
+                          type: string
+                        aircraftBuildDate:
+                          type: string
+                          format: date
+                        aircraftModel:
+                          type: string
+        "403":
+          description: Unauthenticated
     post:
+      summary:
+        Create one aircraft
       security:
         - BearerAuth: []
       tags:
@@ -199,49 +230,19 @@ paths:
                     type: string
         "403":
           description: Unauthenticated
-  /aircrafts/all:
+
+  /static/fetchAllAirports:
     get:
       tags:
-        - Aircraft
-      summary: Get all Aircraft from 
-      security:
-        - BearerAuth: []
+        - Static
+      summary: Fetch all airport from RapidAPI and store it to the database
       responses:
         "200":
-          description: success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  aircrafts: 
-                    type: array
-                    items:
-                     type: object
-                     properties:
-                      aircraftType:
-                        type: string
-                      aircraftRegistration:
-                        type: string
-                      aircraftBuildDate:
-                        type: string
-                        format: date
-                      aircraftModel:
-                        type: string
-        "403":
-          description: Unauthenticated
-  /static/fetchAllAirports:
-      get:
-        tags:
-          - Static
-        summary: Fetch all airport from RapidAPI and store it to the database
-        responses:
-          "200":
-            description: No data existed yet and data is added to database
-          "400":
-            description: Data already existed
-  /route/new:
-    post: 
+          description: No data existed yet and data is added to database
+        "400":
+          description: Data already existed
+  /routes:
+    post:
       security:
         - BearerAuth: []
       tags:
@@ -267,7 +268,7 @@ paths:
                     properties:
                       longitude:
                         type: number
-                      latitude: 
+                      latitude:
                         type: number
                 departingDate:
                   type: string
@@ -288,7 +289,7 @@ paths:
                 properties:
                   success:
                     type: boolean
-  /route/{routeId}:
+  /routes/{routeId}:
     get:
       parameters:
         - in: path
@@ -304,4 +305,24 @@ paths:
         - BearerAuth: []
       responses:
         "200":
-          description: success
+          description: Path successfully fetched
+
+    delete:
+      tags:
+        - Route
+      summary: Delete route with
+
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - in: path
+          name: routeId
+          required: true
+          schema:
+            type: string
+            format: ObjectId
+      responses:
+        "200":
+          description: Path successfully deleted
+    
