@@ -109,15 +109,6 @@ function validateRouteData(routeData) {
     return { valid: false, message: "Date is not valid" };
   }
 
-  if (routeData.waypoints.length > 0) {
-    for (const waypoint of routeData.waypoints) {
-      // Lat or Lon is missing
-      if (!waypoint.hasOwnProperty("latitude") || !waypoint.hasOwnProperty("longitude")) {
-        return { valid: false, message: "Lon or lat is missing" };
-      }
-    }
-  }
-
   return { valid: true };
 }
 

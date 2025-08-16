@@ -27,7 +27,7 @@ const aircraftRoutes = require("@route/aircraft.route.js");
 const routeRoutes = require("@route/route.route.js");
 
 //Use Once:
-const fetchAllAirportsRoute = require("@route/airportStatic.route.js");
+const staticRoutes = require("@route/static.route.js");
 
 const app = express();
 
@@ -41,7 +41,7 @@ app.use(express.urlencoded({ extended: false })); // Help to parse the body if a
 app.use(express.json()); //Help to parse the request in JSON format
 app.use(cookieParser()); //Help to parse the cookie
 
-app.use("/static", fetchAllAirportsRoute); //Initialise the app, only use once
+app.use("/static", staticRoutes); //Initialise the app, only use once
 
 app.use("/auth", authRoutes);
 

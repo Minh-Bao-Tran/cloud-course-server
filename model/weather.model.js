@@ -1,11 +1,16 @@
+const mongodb = require("mongodb");
+
+const db = require("../data/database.js");
+
 class Weather {
-  constructor(
+  constructor (
     windSpeed = 0, //Float, windspeed is in knot
     direction = 0, //Float, true bearing
     cloud = null,
     gust = null,
     visibility = null,
-    message = null
+    message = null,
+    _id = new mongodb.ObjectId()
   ) {
     this.windSpeed = windSpeed;
     this.direction = direction;
@@ -13,6 +18,20 @@ class Weather {
     this.gust = gust;
     this.visibility = visibility;
     this.message = message;
+    this._id = _id;
+    //   weather: {
+    //     message: condition.text from API
+    //     windSpeed: float, knot,
+    //     direction: compass, bearing
+    //     cloud: ;
+    //     gust: knot
+    //     visibility: in km
+    //   }
+  }
+
+  async addWeather(collection = "weather") {
+    const result = await db.getDb().collection(collection).insertOne(this);
+    return result;
   }
 
   static async fetchWeather(position) {

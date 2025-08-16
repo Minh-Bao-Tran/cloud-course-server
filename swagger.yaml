@@ -160,8 +160,7 @@ paths:
         "403":
           description: Unauthenticated
     post:
-      summary:
-        Create one aircraft
+      summary: Create one aircraft
       security:
         - BearerAuth: []
       tags:
@@ -232,7 +231,7 @@ paths:
           description: Unauthenticated
 
   /static/fetchAllAirports:
-    get:
+    post:
       tags:
         - Static
       summary: Fetch all airport from RapidAPI and store it to the database
@@ -241,6 +240,35 @@ paths:
           description: No data existed yet and data is added to database
         "400":
           description: Data already existed
+
+  /static/waypoint:
+    post:
+      tags:
+        - Static
+      summary: Add waypoint to static data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                name:
+                  type: string
+      responses:
+        "200":
+          description: Waypoint is added to database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: 
+                    type: boolean
   /routes:
     post:
       security:
@@ -264,12 +292,8 @@ paths:
                 waypoints:
                   type: array
                   items:
-                    type: object
-                    properties:
-                      longitude:
-                        type: number
-                      latitude:
-                        type: number
+                    type: string
+                    format: ObjectId
                 departingDate:
                   type: string
                   format: date-time
@@ -325,4 +349,3 @@ paths:
       responses:
         "200":
           description: Path successfully deleted
-    
