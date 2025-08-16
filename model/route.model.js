@@ -5,8 +5,10 @@ const { getDistance, getGreatCircleBearing } = require("geolib");
 const { addDecimalTime } = require("@util/timeUtil.js");
 
 const Weather = require("@model/weather.model.js");
+const Waypoint = require("@model/waypoint.model.js")
+
 class Route {
-  constructor(
+  constructor (
     departingAirport, //Airport Code
     arrivingAirport, //Airport Code
     waypoints, //An array containing objects with property of Lat and Lon
@@ -189,10 +191,7 @@ class Route {
     for (const waypoint of this.waypoints) {
       let weather;
       try {
-        const result = await Weather.fetchWeather({
-          latitude: waypoint.latitude,
-          longitude: waypoint.longitude,
-        });
+        const result = await Weather.fetchWeatherById(new mongodb.ObjectId(waypoint._id));
         if (!result.valid) {
           //result is not valid
           return {
@@ -206,6 +205,15 @@ class Route {
         return { success: false, error: error };
       }
       const newWaypoint = { ...waypoint, weather: weather };
+      //each waypoint here would be of the format: 
+      //{
+      // _id,
+      // latitude,
+      // longitude,
+      // name,
+      // weather: weather object
+      // }
+
       newWaypoints.push(newWaypoint);
     }
     this.waypoints = newWaypoints;
@@ -272,8 +280,8 @@ class Route {
     return result;
   }
 
-  static async deleteOneRoute(userId, routeId){
-        const result = await db
+  static async deleteOneRoute(userId, routeId) {
+    const result = await db
       .getDb()
       .collection("routes")
       .deleteOne({ _id: routeId, userId: userId });

@@ -86,6 +86,15 @@ class Weather {
     );
     return { valid: true, weather: weather };
   }
+
+  static async fetchWeatherById(weatherId){
+    const result = await db
+      .getDb()
+      .collection("weather")
+      .findOne({ _id: weatherId });
+
+    return result;
+  }
 }
 
 module.exports = Weather;

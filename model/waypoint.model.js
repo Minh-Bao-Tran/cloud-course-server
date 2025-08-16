@@ -15,6 +15,17 @@ class Waypoint {
         const result = await db.getDb().collection(collection).insertOne(this);
         return result;
     }
+    async fetchWaypointById(waypointId) {
+        const result = await db
+            .getDb()
+            .collection("waypoints")
+            .findOne({ _id: waypointId });
+
+        return result;
+    }
+    async fetchWaypointByAirportName(airportName){
+        
+    }
 }
 
 module.exports = Waypoint;
