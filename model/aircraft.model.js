@@ -2,7 +2,7 @@ const db = require("../data/database.js");
 const mongodb = require("mongodb");
 
 class Aircraft {
-  constructor(
+  constructor (
     aircraftType, //String
     aircraftRegistration, //String, length == 6
     aircraftBuildDate, //String, to be converted into Date
@@ -48,8 +48,16 @@ class Aircraft {
       $set: {
         status: status
       }
-    }
-    const result = await db.getDb().collection("aircrafts").updateOne({ _id: aircraftId }, updatedDocument)
+    };
+    const result = await db.getDb().collection("aircrafts").updateOne({ _id: aircraftId }, updatedDocument);
+    return result;
+  }
+
+  static async fetchAircraftModelInfo(aircraftType) {
+    const result = await db
+      .getDb()
+      .collection("aircraftStatic")
+      .findOne({ aircraftType: aircraftType });
     return result;
   }
 }
