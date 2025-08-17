@@ -22,6 +22,12 @@ async function updateAllWeather(req, res, next) {
     res.json(JSON.stringify({ success: true }));
 };
 
+async function get4RandomWeather(req, res, next) {
+    const weatherList = await Weather.fetchRandomWeather(4);
+    res.json(JSON.stringify({ weather: weatherList }));
+}
+
 module.exports = {
-    updateAllWeather: updateAllWeather
+    updateAllWeather: updateAllWeather,
+    get4RandomWeather: get4RandomWeather
 };

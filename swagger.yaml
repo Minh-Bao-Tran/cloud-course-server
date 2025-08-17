@@ -23,6 +23,8 @@ tags:
     description: Create Route for each Aircraft
   - name: Weather
     description: Weather management
+  - name: Waypoint
+    description: Waypoint management
   - name: Static
     description: Initialise the app with data
 
@@ -445,3 +447,18 @@ paths:
       responses:
         "200":
           description: success
+    get:
+      tags:
+        - Weather
+      responses:
+        "200":
+          description: return 4 random weather objects
+
+  /waypoints:
+    get:
+      description: get all waypoints
+      tags:
+        - Waypoint
+      responses:
+        "200":
+          description: all way point with weather is fetched

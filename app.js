@@ -29,6 +29,7 @@ const routeRoutes = require("@route/route.route.js");
 //Use Once:
 const weatherRoutes = require("@route/weather.route.js");
 const staticRoutes = require("@route/static.route.js");
+const waypointRoutes = require("@route/waypoint.route.js");
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use(cookieParser()); //Help to parse the cookie
 
 app.use("/static", staticRoutes); //Initialise the app, only use once
 app.use("/weather", weatherRoutes);
+app.use("/waypoints", waypointRoutes);
 
 app.use("/auth", authRoutes);
 

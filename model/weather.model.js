@@ -115,6 +115,11 @@ class Weather {
     return { valid: false, message: "weather for waypoint not found" };
   }
 
+  static async fetchRandomWeather(number) {
+    const result = await db.getDb().collection("weather").aggregate([{ $sample: { size: number } }]).toArray();
+    return result;
+  }
+
 }
 
 module.exports = Weather;
