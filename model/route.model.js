@@ -66,44 +66,14 @@ class Route {
     }
   }
 
-  async fetchWindDataForAllWaypoints() {
-    const newWaypoints = [];
-
-    for (const waypoint of this.waypoints) {
-      let weather;
-      try {
-        const result = await Weather.fetchWeatherById(waypoint.weatherId);
-        if (!result.valid) {
-          //result is not valid
-          return {
-            success: false,
-            error: "Something went wrong, cannot fetch weather",
-          };
-        }
-
-        weather = result.weather;
-      } catch (error) {
-        return { success: false, error: error };
-      }
-      const newWaypoint = { ...waypoint, weather: weather };
-      //each waypoint here would be of the format: 
-      //{
-      // _id,
-      // latitude,
-      // longitude,
-      // name,
-      //weatherId
-      // weather: weather object
-      // }
-
-      newWaypoints.push(newWaypoint);
-    }
-    this.waypoints = newWaypoints;
-    return { success: true };
-  }
-
   async addRoutes(collection = "routes") {
     const result = await db.getDb().collection(collection).insertOne(this);
+    return result;
+  }
+
+  async updateRoutes(collection = "routes") {
+    const { _id, userId, ...restOfDocument } = this;
+    const result = await db.getDb().collection(collection).updateOne({ _id: this._id }, { $set: restOfDocument });
     return result;
   }
 

@@ -21,49 +21,70 @@ class Leg {
         //   relativeAircraftDir: to keep the course, to direction
         //   airspeed: = aircraft speed + windSpeed, using vector addition(both of the are vector quantities)
     }
+    static async transformNormalisedLegIntoLeg(normalizeLegList) {
+        const legList = [];
+        for (const normalizeLeg of normalizeLegList) {
+            const startingWaypointId = normalizeLeg.startingWaypointId;
+            const endingWaypointId = normalizeLeg.endingWaypointId;
+            const currentLeg = await Leg.createAndInitLeg(startingWaypointId, endingWaypointId);
+            if (!currentLeg.success) {
+                return { success: false, message: `Can not create Leg ${i}. ` + error };
+            }
+            legList.push(currentLeg.currentLeg);
+        }
+        return { success: true, legList: legList };
+    }
     static async transformWaypointIntoLeg(waypointList) {
         //Each waypoint here would only be a waypointId 
         const legList = [];
         for (let i = 0; i <= waypointList.length - 2; i++) {
             const startingWaypointId = waypointList[i];
             const endingWaypointId = waypointList[i + 1];
-            const currentLeg = new Leg(startingWaypointId, endingWaypointId);
-            //Leg is created
-            try {
-                currentLeg.startingWaypoint = await Waypoint.fetchWaypointById(startingWaypointId);
-                //Waypoint is already in ObjectId
-                currentLeg.endingWaypoint = await Waypoint.fetchWaypointById(endingWaypointId);
-            } catch (error) {
-                return { success: false, error: error };
+            const currentLeg = await Leg.createAndInitLeg(startingWaypointId, endingWaypointId);
+            if (!currentLeg.success) {
+                return { success: false, message: `Can not create Leg ${i}. ` + error };
             }
-
-            if (!currentLeg.startingWaypoint || !currentLeg.endingWaypoint) {
-                //Waypoint does not exist
-                return { success: false, error: "Waypoint does not exist" };
-            }
-
-            //Calc distance and speed
-            currentLeg.calcTrueDistanceAndDirection();
-
-            //2 of the Waypoint is fetched and added to the Leg 
-            try {
-                const result1 = await currentLeg.startingWaypoint.fetchWeatherForWaypoint();
-                const result2 = await currentLeg.endingWaypoint.fetchWeatherForWaypoint();
-                if (!result1.success || !result2.success) {
-                    //Operation failed
-                    return { success: false, error: "Could not fetch weather for waypoints" };
-                }
-            } catch (error) {
-                return { success: false, error: error };
-            }
-
-            //Weather is in Waypoint
-            currentLeg.calcRelativeDirectionAndSpeed();
-
-            currentLeg.calcTime();
-            legList.push(currentLeg);
+            legList.push(currentLeg.currentLeg);
         }
-        return legList;
+        return { success: true, legList: legList };
+    }
+
+    static async createAndInitLeg(startingWaypointId, endingWaypointId) {
+        const currentLeg = new Leg(startingWaypointId, endingWaypointId);
+        //Leg is created
+        try {
+            currentLeg.startingWaypoint = await Waypoint.fetchWaypointById(startingWaypointId);
+            //Waypoint is already in ObjectId
+            currentLeg.endingWaypoint = await Waypoint.fetchWaypointById(endingWaypointId);
+        } catch (error) {
+            return { success: false, error: error };
+        }
+
+        if (!currentLeg.startingWaypoint || !currentLeg.endingWaypoint) {
+            //Waypoint does not exist
+            return { success: false, error: "Waypoint does not exist" };
+        }
+
+        //Calc distance and speed
+        currentLeg.calcTrueDistanceAndDirection();
+
+        //2 of the Waypoint is fetched and added to the Leg 
+        try {
+            const result1 = await currentLeg.startingWaypoint.fetchWeatherForWaypoint();
+            const result2 = await currentLeg.endingWaypoint.fetchWeatherForWaypoint();
+            if (!result1.success || !result2.success) {
+                //Operation failed
+                return { success: false, error: "Could not fetch weather for waypoints" };
+            }
+        } catch (error) {
+            return { success: false, error: error };
+        }
+
+        //Weather is in Waypoint
+        currentLeg.calcRelativeDirectionAndSpeed();
+
+        currentLeg.calcTime();
+        return { success: true, currentLeg: currentLeg };
     }
 
     calcTrueDistanceAndDirection() {

@@ -267,7 +267,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  success: 
+                  success:
                     type: boolean
   /routes:
     post:
@@ -331,6 +331,56 @@ paths:
         "200":
           description: Path successfully fetched
 
+    put:
+      parameters:
+        - in: path
+          name: routeId
+          required: true
+          schema:
+            type: string
+            format: ObjectId
+      security:
+        - BearerAuth: []
+      tags:
+        - Route
+      description: Update Route 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                departingAirport:
+                  type: string
+                  format: ICAO or YATA code
+                arrivingAirport:
+                  type: string
+                  format: ICAO or YATA code
+                waypoints:
+                  type: array
+                  items:
+                    type: string
+                    format: ObjectId
+                departingDate:
+                  type: string
+                  format: date-time
+                arrivingDate:
+                  type: string
+                  format: date-time
+                aircraftId:
+                  type: string
+                  format: ObjectId
+      responses:
+        "200":
+          description: Route updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
     delete:
       tags:
         - Route
