@@ -87,14 +87,27 @@ class Weather {
     return { valid: true, weather: weather };
   }
 
-  static async fetchWeatherById(weatherId){
+  static async fetchWeatherById(weatherId) {
     const result = await db
       .getDb()
       .collection("weather")
       .findOne({ _id: weatherId });
 
-    return result;
+    if (result) {
+      const weather = new Weather(
+        result.windSpeed,
+        result.direction,
+        result.cloud,
+        result.gust,
+        result.visibility,
+        result.message
+      );
+      //return result if weather if found
+      return { valid: true, weather: weather };
+    }
+    return { valid: false, message: "weather for waypoint not found" };
   }
+
 }
 
 module.exports = Weather;

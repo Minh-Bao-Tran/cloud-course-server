@@ -2,7 +2,7 @@ const createHttpError = require("http-errors");
 const mongodb = require("mongodb");
 
 const Aircraft = require("@model/aircraft.model.js");
-const User = require("@model/user.model.js");
+const Leg = require("@model/leg.model.js");
 const Route = require("@model/route.model.js");
 
 const validateUtil = require("@util/validateUtil.js");
@@ -58,46 +58,43 @@ async function addNewRoute(req, res, next) {
     next(error);
   }
   if (!arrivingAirport || !departingAirport) {
-    //Airport is not in database
+    //Airport is not in 
     return next(createHttpError(400, "Airport is not in database"));
   }
 
-  //Create the route object
-  const routeId = new mongodb.ObjectId();
+  //Don't change anything from above
+  const waypointIdList = routeData.waypoints.map((waypointId) => {
+    return new mongodb.ObjectId(waypointId);
+  });
+
+  const allWaypointList = [departingAirport._id, ...waypointIdList, arrivingAirport._id];
+  //Adding airport Id as a waypoint
+  const legList = await Leg.transformWaypointIntoLeg(allWaypointList);
+  console.log(legList);
+
+
+  // Create the route object
   const route = new Route(
     departingAirportCode,
     arrivingAirportCode,
-    routeData.waypoints,
+    legList,
     routeData.departingDate,
     routeData.arrivingDate,
     aircraftId,
     userId,
-    routeId
   );
 
-  try {
-    await route.addAirportToWaypoints();
-  } catch (error) {
-    next(error);
-  }
-  route.calcTrueDistanceAndSpeed();
-
-  const tryFetchWeather = await route.fetchWindDataForAllWaypoints();
-  //Return success or not
-  if (!tryFetchWeather.success) {
-    next(createHttpError(500, tryFetchWeather.error));
-  }
-
-  //Weather is successfully fetched and added to the route object
-  route.calcRelativeDirectionAndSpeed();
-  route.calcTime();
+  route.calcTotalTime();
   route.calcArrivingTime();
+  route.calcTotalDistance();
 
+
+  route.normalizeLegs();
   let result;
   try {
     result = await route.addRoutes();
   } catch (error) {
-    next(error);
+    return next(error);
   }
 
   res.json(JSON.stringify({ success: result.acknowledged }));
@@ -135,7 +132,7 @@ async function getOneRoute(req, res, next) {
 
 }
 
-async function updateRoute(){
+async function updateRoute() {
   if (!req.auth) {
     next(createHttpError(500, "Internal Error"));
   }
