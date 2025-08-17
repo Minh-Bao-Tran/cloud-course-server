@@ -21,6 +21,8 @@ tags:
     description: Aircraft management
   - name: Route
     description: Create Route for each Aircraft
+  - name: Weather
+    description: Weather management
   - name: Static
     description: Initialise the app with data
 
@@ -240,7 +242,6 @@ paths:
           description: No data existed yet and data is added to database
         "400":
           description: Data already existed
-
   /static/waypoint:
     post:
       tags:
@@ -269,6 +270,7 @@ paths:
                 properties:
                   success:
                     type: boolean
+
   /routes:
     post:
       security:
@@ -330,7 +332,6 @@ paths:
       responses:
         "200":
           description: Path successfully fetched
-
     put:
       parameters:
         - in: path
@@ -343,7 +344,7 @@ paths:
         - BearerAuth: []
       tags:
         - Route
-      description: Update Route 
+      description: Update Route
       requestBody:
         required: true
         content:
@@ -399,3 +400,48 @@ paths:
       responses:
         "200":
           description: Path successfully deleted
+  /routes/calc:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Route
+      description: Add Route to the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                departingAirport:
+                  type: string
+                  format: ICAO or YATA code
+                arrivingAirport:
+                  type: string
+                  format: ICAO or YATA code
+                waypoints:
+                  type: array
+                  items:
+                    type: string
+                    format: ObjectId
+                departingDate:
+                  type: string
+                  format: date-time
+                arrivingDate:
+                  type: string
+                  format: date-time
+                aircraftId:
+                  type: string
+                  format: ObjectId
+      responses:
+        "200":
+          description: Return a full Route object'
+
+  /weather:
+    put:
+      tags:
+        - Weather
+      responses:
+        "200":
+          description: success

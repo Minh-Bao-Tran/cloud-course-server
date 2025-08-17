@@ -31,6 +31,7 @@ class Waypoint {
         // }
     }
     async addWaypoint(collection = "waypoints") {
+        delete this.weather;
         const result = await db.getDb().collection(collection).insertOne(this);
         return result;
     }
@@ -46,6 +47,21 @@ class Waypoint {
             result.name,
             result.weatherId,
             result._id);
+    }
+    static async fetchAllWaypoint() {
+        const result = await db
+            .getDb()
+            .collection("waypoints")
+            .find({}).toArray();
+
+        const resultWaypoint = result.map((waypoint => new Waypoint(
+            waypoint.latitude,
+            waypoint.longitude,
+            waypoint.name,
+            waypoint.weatherId,
+            waypoint._id)));
+
+        return resultWaypoint;
     }
 
     async fetchWeatherForWaypoint() {

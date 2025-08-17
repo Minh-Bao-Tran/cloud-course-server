@@ -34,6 +34,13 @@ class Weather {
     return result;
   }
 
+  async updateWeather() {
+    const { _id, ...restOfDocument } = this;
+
+    const result = await db.getDb().collection("weather").updateOne({ _id: _id }, { $set: restOfDocument });
+    return result;
+  }
+
   static async fetchWeather(position) {
     if (
       !position.hasOwnProperty("latitude") ||

@@ -1,11 +1,7 @@
 const db = require("../data/database.js");
 
 const mongodb = require("mongodb");
-const { getDistance, getGreatCircleBearing } = require("geolib");
 const { addDecimalTime } = require("@util/timeUtil.js");
-
-const Weather = require("@model/weather.model.js");
-const Waypoint = require("@model/waypoint.model.js");
 
 class Route {
   constructor (

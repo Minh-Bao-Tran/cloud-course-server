@@ -27,6 +27,7 @@ const aircraftRoutes = require("@route/aircraft.route.js");
 const routeRoutes = require("@route/route.route.js");
 
 //Use Once:
+const weatherRoutes = require("@route/weather.route.js");
 const staticRoutes = require("@route/static.route.js");
 
 const app = express();
@@ -42,6 +43,7 @@ app.use(express.json()); //Help to parse the request in JSON format
 app.use(cookieParser()); //Help to parse the cookie
 
 app.use("/static", staticRoutes); //Initialise the app, only use once
+app.use("/weather", weatherRoutes);
 
 app.use("/auth", authRoutes);
 
@@ -50,11 +52,9 @@ app.use(authenticateMiddleware); // Any routes that requires authentication is b
 app.use("/aircrafts", aircraftRoutes);
 app.use("/routes", routeRoutes);
 
-const Weather = require("@model/weather.model.js");
 app.get("/testAuth", async function (req, res) {
   console.log(req.auth);
-  const weather = await Weather.fetchWeather({ lat: 53.1, lon: -0.13 });
-  return res.json(JSON.stringify(weather));
+  return res.json(JSON.stringify(req.auth));
 });
 
 app.use(errorHandlingMiddleware); //Error handling middleware is always at the last position
