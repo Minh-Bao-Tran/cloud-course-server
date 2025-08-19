@@ -63,6 +63,7 @@ async function getOneRoute(req, res, next) {
 
   let legList;
   try {
+    // const aircraftSpeed = await Aircraft.fetchAircraftModelInfo(route)
     const legListResult = await Leg.transformWaypointIntoLeg(allWaypointList);
     if (!legListResult.success) {
       return next(createHttpError(400, message));
@@ -71,8 +72,6 @@ async function getOneRoute(req, res, next) {
   } catch (error) {
     return next(error);
   }
-  console.log(legList);
-
   if (!fetchedRoute) {
     // aircraft doesn't exist
     return next(
@@ -86,6 +85,7 @@ async function getOneRoute(req, res, next) {
   const route = new Route(
     fetchedRoute.departingAirport,
     fetchedRoute.arrivingAirport,
+    fetchedRoute.waypoints,
     legList,
     fetchedRoute.departingDate,
     fetchedRoute.arrivingDate,
@@ -166,6 +166,6 @@ module.exports = {
   addNewRoute: addNewRoute,
   getOneRoute: getOneRoute,
   deleteOneRoute: deleteOneRoute,
-  updateRoute: updateRoute, 
+  updateRoute: updateRoute,
   calcRoute: calcRoute
 };

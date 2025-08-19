@@ -5,12 +5,13 @@ const db = require("../data/database.js");
 const Weather = require("@model/weather.model.js");
 
 class Waypoint {
-    constructor (latitude, longitude, name, weatherId, _id = new mongodb.ObjectId()) {
+    constructor (latitude, longitude, name, weatherId, _id = new mongodb.ObjectId(), type = "wNormal") {
         this._id = _id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
         this.weatherId = weatherId;
+        this.type = type;
         this.weather = {};
         // final waypoint would be of the format:
         // {
@@ -34,6 +35,30 @@ class Waypoint {
         delete this.weather;
         const result = await db.getDb().collection(collection).insertOne(this);
         return result;
+    }
+    async fetchWeatherForWaypoint() {
+        let weather;
+        try {
+            const weatherObjectId = new mongodb.ObjectId(this.weatherId);
+            const result = await Weather.fetchWeatherById(weatherObjectId);
+            if (!result.valid) {
+                //result is not valid
+                return {
+                    success: false,
+                    error: "Something went wrong, cannot fetch weather",
+                };
+            }
+
+            weather = result.weather;
+            //result is an object with key valid and weather
+        } catch (error) {
+            return { success: false, error: error };
+        }
+
+        //Weather is successfully fetched
+        this.weather = weather;
+
+        return { success: true };
     }
     static async fetchWaypointById(waypointId) {
         //Waypoint Id is already in ObjectId 
@@ -59,35 +84,17 @@ class Waypoint {
             waypoint.longitude,
             waypoint.name,
             waypoint.weatherId,
-            waypoint._id)));
+            waypoint._id,
+            waypoint.type)));
 
         return resultWaypoint;
     }
 
-    async fetchWeatherForWaypoint() {
-        let weather;
-        try {
-            const weatherObjectId = new mongodb.ObjectId(this.weatherId);
-            const result = await Weather.fetchWeatherById(weatherObjectId);
-            if (!result.valid) {
-                //result is not valid
-                return {
-                    success: false,
-                    error: "Something went wrong, cannot fetch weather",
-                };
-            }
-
-            weather = result.weather;
-            //result is an object with key valid and weather
-        } catch (error) {
-            return { success: false, error: error };
-        }
-
-        //Weather is successfully fetched
-        this.weather = weather;
-
-        return { success: true };
+    static async fetchAllAirport() {
+        const result = await db.getDb().collection("waypoints").find({ type: "airport" }).toArray();
+        return result
     }
+
 }
 
 module.exports = Waypoint;

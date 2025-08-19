@@ -30,7 +30,6 @@ class Aircraft {
       .collection("aircrafts")
       .find({ userId: userId })
       .toArray();
-    console.log(result);
     return result;
   }
 

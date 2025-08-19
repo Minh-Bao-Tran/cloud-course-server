@@ -7,15 +7,16 @@ class Route {
   constructor (
     departingAirport, //Airport Code
     arrivingAirport, //Airport Code
+    waypoints,
     legs, //An array containing objects with property of Lat and Lon
     departingDate, //String, to be converted into Date Object
     arrivingDate, //String, to be converted into Date Object
     aircraftId, //ObjectId
-    userId, //ObjectId
+    userId, //ObjectId,
     _id = new mongodb.ObjectId(),
     distance = 0,
     time = 0,
-    active = false
+    active = false,
   ) {
     this._id = _id;
     this.departingAirport = departingAirport;
@@ -25,7 +26,7 @@ class Route {
     this.aircraftId = aircraftId;
     this.userId = userId;
     this.legs = legs;
-    // 
+    this.waypoints = [...waypoints];
     this.distance = distance;
     this.time = time;
     this.active = active;

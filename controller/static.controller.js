@@ -17,8 +17,6 @@ async function addAllAirports(req, res, next) {
         return next(createHttpError(400, "Data already existed"));
     }
 
-    console.log(existingAirports);
-
     let response;
     try {
         response = await fetch(
@@ -91,7 +89,13 @@ async function addOneWaypoint(req, res, next) {
     res.json(JSON.stringify({ result: waypointResult.acknowledged && weatherResult.acknowledged }));
 }
 
+async function getAllAirport(req, res, next) {
+    const result = await Waypoint.fetchAllAirport();
+    res.json(JSON.stringify(result));
+}
+
 module.exports = {
     addAllAirports: addAllAirports,
-    addOneWaypoint: addOneWaypoint
+    addOneWaypoint: addOneWaypoint,
+    getAllAirport: getAllAirport
 };

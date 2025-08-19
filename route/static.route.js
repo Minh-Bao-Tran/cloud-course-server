@@ -8,6 +8,7 @@ const router = express.Router();
 
 //fetch all airport once just for the database
 // Note:
+router.get("/airports", staticController.getAllAirport)
 
 router.post("/fetchAllAirports", staticController.addAllAirports);
 

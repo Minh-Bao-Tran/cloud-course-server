@@ -34,13 +34,13 @@ class Leg {
         }
         return { success: true, legList: legList };
     }
-    static async transformWaypointIntoLeg(waypointList) {
+    static async transformWaypointIntoLeg(waypointList, aircraftSpeed = 120) {
         //Each waypoint here would only be a waypointId 
         const legList = [];
         for (let i = 0; i <= waypointList.length - 2; i++) {
             const startingWaypointId = waypointList[i];
             const endingWaypointId = waypointList[i + 1];
-            const currentLeg = await Leg.createAndInitLeg(startingWaypointId, endingWaypointId);
+            const currentLeg = await Leg.createAndInitLeg(startingWaypointId, endingWaypointId, aircraftSpeed);
             if (!currentLeg.success) {
                 return { success: false, message: `Can not create Leg ${i}. ` + error };
             }
@@ -49,7 +49,7 @@ class Leg {
         return { success: true, legList: legList };
     }
 
-    static async createAndInitLeg(startingWaypointId, endingWaypointId) {
+    static async createAndInitLeg(startingWaypointId, endingWaypointId, aircraftSpeed) {
         const currentLeg = new Leg(startingWaypointId, endingWaypointId);
         //Leg is created
         try {
@@ -65,7 +65,7 @@ class Leg {
             return { success: false, error: "Waypoint does not exist" };
         }
 
-        //Calc distance and speed
+        //Calc distance and direction
         currentLeg.calcTrueDistanceAndDirection();
 
         //2 of the Waypoint is fetched and added to the Leg 
@@ -81,7 +81,7 @@ class Leg {
         }
 
         //Weather is in Waypoint
-        currentLeg.calcRelativeDirectionAndSpeed();
+        currentLeg.calcRelativeDirectionAndSpeed(aircraftSpeed);
 
         currentLeg.calcTime();
         return { success: true, currentLeg: currentLeg };
@@ -108,15 +108,14 @@ class Leg {
         //Direction and distance is added to the Leg
     }
 
-    calcRelativeDirectionAndSpeed() {
+    calcRelativeDirectionAndSpeed(aircraftSpeed = 120) {
         //To be added vector addition to calc average wind
         const windSpeed = this.startingWaypoint.weather.windSpeed;
         const windDirection = this.startingWaypoint.weather.direction * (Math.PI / 180); //Converting to radians
 
         const finalDirection = this.direction * (Math.PI / 180);
-        const aircraftSpeed = 120; //(cessna 172)
 
-        console.log(finalDirection, aircraftSpeed, windDirection, windSpeed);
+        // console.log(finalDirection, aircraftSpeed, windDirection, windSpeed);
         let aircraftTrueDirection =
             finalDirection +
             Math.PI -
@@ -139,12 +138,12 @@ class Leg {
         const relativeAircraftDirInDegrees =
             (relativeAircraftDirInRadian / Math.PI) * 180;
 
-        console.log(
-            "relativeDir: ",
-            relativeAircraftDirInDegrees,
-            " trueAirspeed: ",
-            trueAirspeed
-        );
+        // console.log(
+        //     "relativeDir: ",
+        //     relativeAircraftDirInDegrees,
+        //     " trueAirspeed: ",
+        //     trueAirspeed
+        // );
 
         this.relativeAircraftDir = relativeAircraftDirInDegrees;
         this.airspeed = trueAirspeed;

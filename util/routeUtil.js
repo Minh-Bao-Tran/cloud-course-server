@@ -24,7 +24,7 @@ async function createRoute(routeData, authData, pastRoute = false) {
     try {
         aircraftId = new mongodb.ObjectId(routeData.aircraftId);
         userId = new mongodb.ObjectId(authData.user._id);
-        console.log(aircraftId);
+        // console.log(aircraftId);
     } catch (error) {
         return { success: false, error: error };
     }
@@ -67,7 +67,8 @@ async function createRoute(routeData, authData, pastRoute = false) {
     //Adding airport Id as a waypoint
     let legList;
     try {
-        const legListResult = await Leg.transformWaypointIntoLeg(allWaypointList);
+        const aircraftSpeed = await Aircraft.fetchAircraftModelInfo(aircraft.aircraftType);
+        const legListResult = await Leg.transformWaypointIntoLeg(allWaypointList, aircraftSpeed);
         if (!legListResult.success) {
             return next(createHttpError(400, message));
         }
@@ -75,7 +76,7 @@ async function createRoute(routeData, authData, pastRoute = false) {
     } catch (error) {
         return { success: false, error: error };
     }
-    console.log(legList);
+    // console.log(legList);
 
     let route;
     if (!pastRoute) {
@@ -83,6 +84,7 @@ async function createRoute(routeData, authData, pastRoute = false) {
         route = new Route(
             departingAirportCode,
             arrivingAirportCode,
+            allWaypointList,
             legList,
             routeData.departingDate,
             routeData.arrivingDate,
@@ -94,6 +96,7 @@ async function createRoute(routeData, authData, pastRoute = false) {
         route = new Route(
             departingAirportCode,
             arrivingAirportCode,
+            allWaypointList,
             legList,
             routeData.departingDate,
             routeData.arrivingDate,
@@ -103,6 +106,7 @@ async function createRoute(routeData, authData, pastRoute = false) {
         );
 
     }
+    console.log(route);
     route.calcTotalTime();
     route.calcArrivingTime();
     route.calcTotalDistance();
