@@ -68,7 +68,7 @@ async function createRoute(routeData, authData, pastRoute = false) {
     let legList;
     try {
         const aircraftSpeed = await Aircraft.fetchAircraftModelInfo(aircraft.aircraftType);
-        const legListResult = await Leg.transformWaypointIntoLeg(allWaypointList, aircraftSpeed);
+        const legListResult = await Leg.transformWaypointIntoLeg(allWaypointList, aircraftSpeed.cruiseSpeed);
         if (!legListResult.success) {
             return next(createHttpError(400, message));
         }

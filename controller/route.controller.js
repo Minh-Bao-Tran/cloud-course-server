@@ -3,6 +3,7 @@ const mongodb = require("mongodb");
 
 const Leg = require("@model/leg.model.js");
 const Route = require("@model/route.model.js");
+const Aircraft = require("@model/aircraft.model.js");
 
 const routeUtil = require("@util/routeUtil.js");
 
@@ -48,6 +49,26 @@ async function getOneRoute(req, res, next) {
     routeId
   );
 
+  let aircraftId;
+  try {
+    aircraftId = new mongodb.ObjectId(fetchedRoute.aircraftId);
+    // console.log(aircraftId);
+  } catch (error) {
+    return { success: false, error: error };
+  }
+
+  let aircraft;
+  try {
+    aircraft = await Aircraft.fetchAircraftByAircraftId(userId, aircraftId);
+  } catch (error) {
+    return { success: false, error: error };
+  }
+
+  if (!aircraft) {
+    //Aircraft doesn't exist
+    return next(createHttpError(400, "Aircraft does not exist"));
+  }
+
   if (!fetchedRoute) {
     return next(createHttpError(400, "Route either does not exist or route does not belong to user"));
   }
@@ -63,7 +84,6 @@ async function getOneRoute(req, res, next) {
 
   let legList;
   try {
-    // const aircraftSpeed = await Aircraft.fetchAircraftModelInfo(route)
     const legListResult = await Leg.transformWaypointIntoLeg(allWaypointList);
     if (!legListResult.success) {
       return next(createHttpError(400, message));
@@ -71,15 +91,6 @@ async function getOneRoute(req, res, next) {
     legList = legListResult.legList;
   } catch (error) {
     return next(error);
-  }
-  if (!fetchedRoute) {
-    // aircraft doesn't exist
-    return next(
-      createHttpError(
-        400,
-        "Route does not exist or Route does not belong to user"
-      )
-    );
   }
 
   const route = new Route(
