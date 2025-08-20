@@ -28,7 +28,7 @@ async function addNewRoute(req, res, next) {
     return next(error);
   }
 
-  res.json(JSON.stringify({ success: result.acknowledged }));
+  res.json(JSON.stringify({ success: result.acknowledged, _id: result.insertedId }));
 }
 
 async function getOneRoute(req, res, next) {
